@@ -243,6 +243,7 @@ public class LongPollingService {
         
         String str = req.getHeader(LongPollingService.LONG_POLLING_HEADER);
         String noHangUpFlag = req.getHeader(LongPollingService.LONG_POLLING_NO_HANG_UP_HEADER);
+        //延迟时间
         int delayTime = SwitchService.getSwitchInteger(SwitchService.FIXED_DELAY_TIME, 500);
         
         // Add delay time for LoadBalance, and one response is returned 500 ms in advance to avoid client timeout.

@@ -93,6 +93,7 @@ import java.util.stream.Collectors;
 
 /**
  * Special controller for soft load client to publish data.
+ * 用于软加载客户端发布数据的专用控制器。
  *
  * @author leiwen
  */

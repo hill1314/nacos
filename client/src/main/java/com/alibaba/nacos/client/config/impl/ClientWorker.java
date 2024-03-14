@@ -416,6 +416,7 @@ public class ClientWorker implements Closeable {
         
         agent = new ConfigRpcTransportClient(properties, serverListManager);
         int count = ThreadUtils.getSuitableThreadCount(THREAD_MULTIPLE);
+        //创建线程池
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(Math.max(count, MIN_THREAD_NUM),
                 r -> {
                     Thread t = new Thread(r);

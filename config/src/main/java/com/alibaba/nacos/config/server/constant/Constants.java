@@ -123,7 +123,8 @@ public class Constants {
     public static final String CAPACITY_CONTROLLER_PATH = BASE_PATH + "/capacity";
     
     public static final String COMMUNICATION_CONTROLLER_PATH = BASE_PATH + "/communication";
-    
+    //发布配置 curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test&content=HelloWorld"
+    //获取配置 curl -X GET "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test"
     public static final String CONFIG_CONTROLLER_PATH = BASE_PATH + "/configs";
     
     public static final String CONFIG_CONTROLLER_V2_PATH = BASE_V2_PATH + "/config";

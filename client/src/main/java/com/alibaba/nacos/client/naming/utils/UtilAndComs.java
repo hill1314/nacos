@@ -28,7 +28,7 @@ public class UtilAndComs {
     public static String webContext = "/nacos";
     
     public static String nacosUrlBase = webContext + "/v1/ns";
-    
+    //服务注册 curl -X POST 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
     public static String nacosUrlInstance = nacosUrlBase + "/instance";
     
     public static String nacosUrlService = nacosUrlBase + "/service";

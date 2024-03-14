@@ -63,9 +63,11 @@ import static com.alibaba.nacos.common.constant.RequestUrlConstants.HTTPS_PREFIX
 import static com.alibaba.nacos.common.constant.RequestUrlConstants.HTTP_PREFIX;
 
 /**
+ * 命名空间http客户端代理
  * Naming proxy.
  *
  * @author nkorange
+ * @date 2024/03/14
  */
 public class NamingHttpClientProxy extends AbstractNamingClientProxy {
     
@@ -215,6 +217,7 @@ public class NamingHttpClientProxy extends AbstractNamingClientProxy {
         params.put(UDP_PORT_PARAM, String.valueOf(udpPort));
         params.put(CLIENT_IP_PARAM, NetUtils.localIP());
         params.put(HEALTHY_ONLY_PARAM, String.valueOf(healthyOnly));
+        //服务发现 curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
         String result = reqApi(UtilAndComs.nacosUrlBase + "/instance/list", params, HttpMethod.GET);
         if (StringUtils.isNotEmpty(result)) {
             return JacksonUtils.toObj(result, ServiceInfo.class);

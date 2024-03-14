@@ -22,7 +22,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Nacos starter.
+ * Nacos 控制台 启动类
  *
  * @author nacos
  */
