@@ -41,23 +41,38 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Service storage.
+ * 服务存储.
  *
  * @author xiweng.yy
  */
 @Component
 public class ServiceStorage {
-    
+
+    /**
+     * 服务索引管理器
+     */
     private final ClientServiceIndexesManager serviceIndexesManager;
-    
+
+    /**
+     * 客户管理
+     */
     private final ClientManager clientManager;
-    
+
     private final SwitchDomain switchDomain;
-    
+
+    /**
+     * 元数据管理器
+     */
     private final NamingMetadataManager metadataManager;
-    
+
+    /**
+     * 服务数据索引
+     */
     private final ConcurrentMap<Service, ServiceInfo> serviceDataIndexes;
-    
+
+    /**
+     * 服务集群索引
+     */
     private final ConcurrentMap<Service, Set<String>> serviceClusterIndex;
     
     public ServiceStorage(ClientServiceIndexesManager serviceIndexesManager, ClientManagerDelegate clientManager,
@@ -77,7 +92,13 @@ public class ServiceStorage {
     public ServiceInfo getData(Service service) {
         return serviceDataIndexes.containsKey(service) ? serviceDataIndexes.get(service) : getPushData(service);
     }
-    
+
+    /**
+     * 获取推送数据
+     *
+     * @param service 服务
+     * @return {@link ServiceInfo }
+     */
     public ServiceInfo getPushData(Service service) {
         ServiceInfo result = emptyServiceInfo(service);
         if (!ServiceManager.getInstance().containSingleton(service)) {
@@ -102,7 +123,13 @@ public class ServiceStorage {
         result.setCacheMillis(switchDomain.getDefaultPushCacheMillis());
         return result;
     }
-    
+
+    /**
+     * 从索引中获取所有实例
+     *
+     * @param service 服务
+     * @return {@link List }<{@link Instance }>
+     */
     private List<Instance> getAllInstancesFromIndex(Service service) {
         Set<Instance> result = new HashSet<>();
         Set<String> clusters = new HashSet<>();
@@ -126,11 +153,13 @@ public class ServiceStorage {
         serviceClusterIndex.put(service, clusters);
         return new LinkedList<>(result);
     }
-    
+
     /**
      * Parse batch instance.
-     * @param service service
+     *
+     * @param service                  service
      * @param batchInstancePublishInfo batchInstancePublishInfo
+     * @param clusters                 集群
      * @return batch instance list
      */
     private List<Instance> parseBatchInstance(Service service, BatchInstancePublishInfo batchInstancePublishInfo, Set<String> clusters) {

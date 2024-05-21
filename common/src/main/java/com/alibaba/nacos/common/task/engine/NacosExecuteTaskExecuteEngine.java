@@ -25,12 +25,16 @@ import org.slf4j.Logger;
 import java.util.Collection;
 
 /**
+ * 任务执行引擎
  * Nacos execute task execute engine.
  *
  * @author xiweng.yy
  */
 public class NacosExecuteTaskExecuteEngine extends AbstractNacosTaskExecuteEngine<AbstractExecuteTask> {
-    
+
+    /**
+     * 执行任务的线程池
+     */
     private final TaskExecuteWorker[] executeWorkers;
     
     public NacosExecuteTaskExecuteEngine(String name, Logger logger) {
