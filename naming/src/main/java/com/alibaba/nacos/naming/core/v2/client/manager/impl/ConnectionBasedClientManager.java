@@ -40,13 +40,17 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 管理客户端的长连接
  * The manager of {@code ConnectionBasedClient}.
  *
  * @author xiweng.yy
  */
 @Component("connectionBasedClientManager")
 public class ConnectionBasedClientManager extends ClientConnectionEventListener implements ClientManager {
-    
+
+    /**
+     * 客户端 长连接 缓存
+     */
     private final ConcurrentMap<String, ConnectionBasedClient> clients = new ConcurrentHashMap<>();
     
     public ConnectionBasedClientManager() {
@@ -65,7 +69,14 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
         attributes.addClientAttribute(ClientConstants.CONNECTION_METADATA, connect.getMetaInfo());
         clientConnected(connect.getMetaInfo().getConnectionId(), attributes);
     }
-    
+
+    /**
+     * 客户端已连接
+     *
+     * @param clientId   客户端id
+     * @param attributes 属性
+     * @return boolean
+     */
     @Override
     public boolean clientConnected(String clientId, ClientAttributes attributes) {
         String type = attributes.getClientAttribute(ClientConstants.CONNECTION_TYPE);

@@ -27,10 +27,16 @@ import com.alibaba.nacos.naming.misc.ClientConfig;
  * @author xiweng.yy
  */
 public class ConnectionBasedClient extends AbstractClient {
-    
+
+    /**
+     * 连接id
+     */
     private final String connectionId;
     
     /**
+     * true：表示该客户端直接连接到当前服务器
+     * false: 表示该客户端是从其他服务器同步过来的
+     *
      * {@code true} means this client is directly connect to current server. {@code false} means this client is synced
      * from other server.
      */

@@ -32,15 +32,22 @@ import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import org.springframework.stereotype.Component;
 
 /**
+ * 服务查询请求处理程序
  * Nacos query instances request handler.
  *
  * @author xiweng.yy
  */
 @Component
 public class ServiceQueryRequestHandler extends RequestHandler<ServiceQueryRequest, QueryServiceResponse> {
-    
+
+    /**
+     * 服务存储器
+     */
     private final ServiceStorage serviceStorage;
-    
+
+    /**
+     * 元数据管理器
+     */
     private final NamingMetadataManager metadataManager;
     
     public ServiceQueryRequestHandler(ServiceStorage serviceStorage, NamingMetadataManager metadataManager) {
@@ -57,6 +64,7 @@ public class ServiceQueryRequestHandler extends RequestHandler<ServiceQueryReque
         Service service = Service.newService(namespaceId, groupName, serviceName);
         String cluster = null == request.getCluster() ? "" : request.getCluster();
         boolean healthyOnly = request.isHealthyOnly();
+        //
         ServiceInfo result = serviceStorage.getData(service);
         ServiceMetadata serviceMetadata = metadataManager.getServiceMetadata(service).orElse(null);
         result = ServiceUtil.selectInstancesWithHealthyProtection(result, serviceMetadata, cluster, healthyOnly, true,

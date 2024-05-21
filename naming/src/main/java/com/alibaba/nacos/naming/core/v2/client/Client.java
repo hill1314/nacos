@@ -25,6 +25,8 @@ import java.util.Collection;
 /**
  * Nacos naming client.
  *
+ * Nacos命名模块在服务端存储了客户端的抽象概念。它用于存储 客户端已发布和订阅了哪些服务
+ *
  * <p>The abstract concept of the client stored by on the server of Nacos naming module. It is used to store which
  * services the client has published and subscribed.
  *

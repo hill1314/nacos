@@ -120,7 +120,15 @@ public class ServiceInfoHolder implements Closeable {
     public Map<String, ServiceInfo> getServiceInfoMap() {
         return serviceInfoMap;
     }
-    
+
+    /**
+     * 获取服务信息
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param clusters    集群
+     * @return {@link ServiceInfo }
+     */
     public ServiceInfo getServiceInfo(final String serviceName, final String groupName, final String clusters) {
         NAMING_LOGGER.debug("failover-mode: {}", failoverReactor.isFailoverSwitch());
         String groupedServiceName = NamingUtils.getGroupedName(serviceName, groupName);

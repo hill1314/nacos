@@ -38,6 +38,7 @@ import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import org.springframework.stereotype.Component;
 
 /**
+ * 订阅服务请求处理程序
  * Handler to handle subscribe service.
  *
  * @author liuzunfei

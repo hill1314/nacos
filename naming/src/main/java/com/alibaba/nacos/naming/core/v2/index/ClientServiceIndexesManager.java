@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * 客户端发布和订阅的索引关系管理
  * Client and service index manager.
  *
  * @author xiweng.yy

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 服务管理，统一管理 服务实例信息
  * Nacos service manager for v2.
  *
  * @author xiweng.yy
@@ -34,16 +35,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceManager {
     
     private static final ServiceManager INSTANCE = new ServiceManager();
-    
+
+    /**
+     * 单一存储库
+     */
     private final ConcurrentHashMap<Service, Service> singletonRepository;
-    
+
+    /**
+     * 命名空间单例映射
+     */
     private final ConcurrentHashMap<String, Set<Service>> namespaceSingletonMaps;
     
+
     private ServiceManager() {
         singletonRepository = new ConcurrentHashMap<>(1 << 10);
         namespaceSingletonMaps = new ConcurrentHashMap<>(1 << 2);
     }
-    
+
     public static ServiceManager getInstance() {
         return INSTANCE;
     }

@@ -172,6 +172,7 @@ public final class ServiceUtil {
     }
 
     /**
+     * 选择具有健康保护的服务信息实例
      * Select instance of service info with healthy protection.
      *
      * @param serviceInfo     original service info

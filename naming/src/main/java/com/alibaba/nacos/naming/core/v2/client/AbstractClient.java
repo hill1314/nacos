@@ -42,9 +42,15 @@ import static com.alibaba.nacos.naming.constants.ClientConstants.REVISION;
  * @author xiweng.yy
  */
 public abstract class AbstractClient implements Client {
-    
+
+    /**
+     * 当前客户端发布的实例
+     */
     protected final ConcurrentHashMap<Service, InstancePublishInfo> publishers = new ConcurrentHashMap<>(16, 0.75f, 1);
-    
+
+    /**
+     * 当前客户端订阅的实例
+     */
     protected final ConcurrentHashMap<Service, Subscriber> subscribers = new ConcurrentHashMap<>(16, 0.75f, 1);
     
     protected volatile long lastUpdatedTime;
@@ -67,7 +73,14 @@ public abstract class AbstractClient implements Client {
     public long getLastUpdatedTime() {
         return lastUpdatedTime;
     }
-    
+
+    /**
+     * 添加服务实例
+     *
+     * @param service             服务
+     * @param instancePublishInfo 实例发布信息
+     * @return boolean
+     */
     @Override
     public boolean addServiceInstance(Service service, InstancePublishInfo instancePublishInfo) {
         if (null == publishers.put(service, instancePublishInfo)) {

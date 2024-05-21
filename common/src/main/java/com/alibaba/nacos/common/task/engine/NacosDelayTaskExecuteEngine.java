@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * 延迟推送任务执行引擎，用来实现服务地址变更的推送任务
  * Nacos delay task execute engine.
  *
  * @author xiweng.yy

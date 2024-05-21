@@ -207,7 +207,9 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     public void doRegisterService(String serviceName, String groupName, Instance instance) throws NacosException {
         InstanceRequest request = new InstanceRequest(namespaceId, serviceName, groupName,
                 NamingRemoteConstants.REGISTER_INSTANCE, instance);
+        //发生请求
         requestToServer(request, Response.class);
+        //更新注册状态
         redoService.instanceRegistered(serviceName, groupName);
     }
     
@@ -347,7 +349,15 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     public boolean serverHealthy() {
         return rpcClient.isRunning();
     }
-    
+
+    /**
+     * 请求到服务器
+     *
+     * @param request       要求
+     * @param responseClass 响应类
+     * @return {@link T }
+     * @throws NacosException NacosException.
+     */
     private <T extends Response> T requestToServer(AbstractNamingRequest request, Class<T> responseClass)
             throws NacosException {
         try {

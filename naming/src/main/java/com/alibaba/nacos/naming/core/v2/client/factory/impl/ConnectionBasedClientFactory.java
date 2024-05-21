@@ -34,7 +34,14 @@ public class ConnectionBasedClientFactory implements ClientFactory<ConnectionBas
     public String getType() {
         return ClientConstants.DEFAULT_FACTORY;
     }
-    
+
+    /**
+     * 新建客户端连接
+     *
+     * @param clientId   客户端id
+     * @param attributes 属性
+     * @return {@link ConnectionBasedClient }
+     */
     @Override
     public ConnectionBasedClient newClient(String clientId, ClientAttributes attributes) {
         long revision = attributes.getClientAttribute(REVISION, 0);

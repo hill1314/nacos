@@ -120,7 +120,17 @@ public class NacosNamingService implements NamingService {
     public void registerInstance(String serviceName, String ip, int port, String clusterName) throws NacosException {
         registerInstance(serviceName, Constants.DEFAULT_GROUP, ip, port, clusterName);
     }
-    
+
+    /**
+     * 注册实例
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param ip          ip
+     * @param port        端口
+     * @param clusterName 群集名称
+     * @throws NacosException NacosException.
+     */
     @Override
     public void registerInstance(String serviceName, String groupName, String ip, int port, String clusterName)
             throws NacosException {
@@ -131,7 +141,14 @@ public class NacosNamingService implements NamingService {
         instance.setClusterName(clusterName);
         registerInstance(serviceName, groupName, instance);
     }
-    
+
+    /**
+     * 注册实例
+     *
+     * @param serviceName 服务名称
+     * @param instance
+     * @throws NacosException NacosException.
+     */
     @Override
     public void registerInstance(String serviceName, Instance instance) throws NacosException {
         registerInstance(serviceName, Constants.DEFAULT_GROUP, instance);
@@ -191,7 +208,14 @@ public class NacosNamingService implements NamingService {
     public void deregisterInstance(String serviceName, String groupName, Instance instance) throws NacosException {
         clientProxy.deregisterService(serviceName, groupName, instance);
     }
-    
+
+    /**
+     * 获取所有实例
+     *
+     * @param serviceName 服务名称
+     * @return {@link List }<{@link Instance }>
+     * @throws NacosException NacosException.
+     */
     @Override
     public List<Instance> getAllInstances(String serviceName) throws NacosException {
         return getAllInstances(serviceName, new ArrayList<>());
@@ -229,18 +253,30 @@ public class NacosNamingService implements NamingService {
             throws NacosException {
         return getAllInstances(serviceName, Constants.DEFAULT_GROUP, clusters, subscribe);
     }
-    
+
+    /**
+     * 获取所有实例
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param clusters    集群
+     * @param subscribe   订阅
+     * @return {@link List }<{@link Instance }>
+     * @throws NacosException NacosException.
+     */
     @Override
     public List<Instance> getAllInstances(String serviceName, String groupName, List<String> clusters,
             boolean subscribe) throws NacosException {
         ServiceInfo serviceInfo;
         String clusterString = StringUtils.join(clusters, ",");
         if (subscribe) {
+            //获取服务信息
             serviceInfo = serviceInfoHolder.getServiceInfo(serviceName, groupName, clusterString);
             if (null == serviceInfo || !clientProxy.isSubscribed(serviceName, groupName, clusterString)) {
                 serviceInfo = clientProxy.subscribe(serviceName, groupName, clusterString);
             }
         } else {
+            //
             serviceInfo = clientProxy.queryInstancesOfService(serviceName, groupName, clusterString, 0, false);
         }
         List<Instance> list;
@@ -378,7 +414,14 @@ public class NacosNamingService implements NamingService {
             return Balancer.RandomByWeight.selectHost(serviceInfo);
         }
     }
-    
+
+    /**
+     * 订阅
+     *
+     * @param serviceName 服务名称
+     * @param listener    听众
+     * @throws NacosException NacosException.
+     */
     @Override
     public void subscribe(String serviceName, EventListener listener) throws NacosException {
         subscribe(serviceName, new ArrayList<>(), listener);
