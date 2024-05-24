@@ -494,19 +494,19 @@
             
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+<!--                    <plugin>-->
+<!--                        <artifactId>maven-gpg-plugin</artifactId>-->
+<!--                        <version>${maven-gpg-plugin.version}</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>sign-artifacts</id>-->
+<!--                                <phase>verify</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>sign</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
                 </plugins>
             </build>
         </profile>
@@ -587,25 +587,25 @@
     
     <!-- Submodule management -->
     <modules>
-        <module>config</module>
-        <module>core</module>
-        <module>naming</module>
-        <module>address</module>
+        <module>nacos-config</module>
+        <module>nacos-core</module>
+        <module>nacos-naming</module>
+        <module>nacos-address</module>
         <module>test</module>
-        <module>api</module>
-        <module>client</module>
-        <module>example</module>
-        <module>common</module>
+        <module>nacos-api</module>
+        <module>nacos-client</module>
+        <module>nacos-example</module>
+        <module>nacos-common</module>
         <module>distribution</module>
-        <module>console</module>
-        <module>cmdb</module>
-        <module>istio</module>
-        <module>consistency</module>
-        <module>auth</module>
+        <module>nacos-console</module>
+        <module>nacos-cmdb</module>
+        <module>nacos-istio</module>
+        <module>nacos-consistency</module>
+        <module>nacos-auth</module>
         <module>sys</module>
-        <module>plugin</module>
+        <module>nacos-plugin</module>
         <module>plugin-default-impl</module>
-        <module>prometheus</module>
+        <module>nacos-prometheus</module>
     </modules>
     
     <!-- Default dependencies in all subprojects -->
