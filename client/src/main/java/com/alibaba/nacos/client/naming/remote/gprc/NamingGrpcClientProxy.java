@@ -83,7 +83,17 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     private final RpcClient rpcClient;
     
     private final NamingGrpcRedoService redoService;
-    
+
+    /**
+     * 命名grpc客户端代理
+     *
+     * @param namespaceId       命名空间id
+     * @param securityProxy     安全代理
+     * @param serverListFactory 服务器列表工厂
+     * @param properties        特性
+     * @param serviceInfoHolder 服务信息持有者
+     * @throws NacosException NacosException.
+     */
     public NamingGrpcClientProxy(String namespaceId, SecurityProxy securityProxy, ServerListFactory serverListFactory,
             NacosClientProperties properties, ServiceInfoHolder serviceInfoHolder) throws NacosException {
         super(securityProxy);
@@ -93,16 +103,27 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
         Map<String, String> labels = new HashMap<>();
         labels.put(RemoteConstants.LABEL_SOURCE, RemoteConstants.LABEL_SOURCE_SDK);
         labels.put(RemoteConstants.LABEL_MODULE, RemoteConstants.LABEL_MODULE_NAMING);
+        //创建 client
         this.rpcClient = RpcClientFactory.createClient(uuid, ConnectionType.GRPC, labels, RpcClientTlsConfig.properties(properties.asProperties()));
         this.redoService = new NamingGrpcRedoService(this);
+        //启动客户端
         start(serverListFactory, serviceInfoHolder);
     }
-    
+
+    /**
+     * 启动
+     *
+     * @param serverListFactory 服务器列表工厂
+     * @param serviceInfoHolder 服务信息持有者
+     * @throws NacosException NacosException.
+     */
     private void start(ServerListFactory serverListFactory, ServiceInfoHolder serviceInfoHolder) throws NacosException {
         rpcClient.serverListFactory(serverListFactory);
         rpcClient.registerConnectionListener(redoService);
         rpcClient.registerServerRequestHandler(new NamingPushRequestHandler(serviceInfoHolder));
+        //启动客户端
         rpcClient.start();
+        //注册订阅
         NotifyCenter.registerSubscriber(this);
     }
     
@@ -215,7 +236,7 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     public void doRegisterService(String serviceName, String groupName, Instance instance) throws NacosException {
         InstanceRequest request = new InstanceRequest(namespaceId, serviceName, groupName,
                 NamingRemoteConstants.REGISTER_INSTANCE, instance);
-        //发生请求
+        //发送请求
         requestToServer(request, Response.class);
         //更新注册状态
         redoService.instanceRegistered(serviceName, groupName);
@@ -371,8 +392,8 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
         try {
             request.putAllHeader(
                     getSecurityHeaders(request.getNamespace(), request.getGroupName(), request.getServiceName()));
-            Response response =
-                    requestTimeout < 0 ? rpcClient.request(request) : rpcClient.request(request, requestTimeout);
+            //执行请求
+            Response response = requestTimeout < 0 ? rpcClient.request(request) : rpcClient.request(request, requestTimeout);
             if (ResponseCode.SUCCESS.getCode() != response.getResultCode()) {
                 throw new NacosException(response.getErrorCode(), response.getMessage());
             }

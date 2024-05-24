@@ -175,6 +175,7 @@ public class NotifyCenter {
         // based on subclass's subscribeTypes method return list, it can register to publisher.
         if (consumer instanceof SmartSubscriber) {
             for (Class<? extends Event> subscribeType : ((SmartSubscriber) consumer).subscribeTypes()) {
+
                 // For case, producer: defaultSharePublisher -> consumer: smartSubscriber.
                 if (ClassUtils.isAssignableFrom(SlowEvent.class, subscribeType)) {
                     INSTANCE.sharePublisher.addSubscriber(consumer, subscribeType);

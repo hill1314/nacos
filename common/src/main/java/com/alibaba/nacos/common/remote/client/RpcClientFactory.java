@@ -75,6 +75,15 @@ public class RpcClientFactory {
         return createClient(clientName, connectionType, null, null, labels);
     }
 
+    /**
+     * 创建客户端
+     *
+     * @param clientName     客户端名称
+     * @param connectionType 连接类型
+     * @param labels         标签
+     * @param tlsConfig      tls配置
+     * @return {@link RpcClient }
+     */
     public static RpcClient createClient(String clientName, ConnectionType connectionType, Map<String, String> labels,
                                          RpcClientTlsConfig tlsConfig) {
         return createClient(clientName, connectionType, null, null, labels, tlsConfig);

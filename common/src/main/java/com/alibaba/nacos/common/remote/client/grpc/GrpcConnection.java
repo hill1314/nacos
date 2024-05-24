@@ -66,10 +66,19 @@ public class GrpcConnection extends Connection {
         super(serverInfo);
         this.executor = executor;
     }
-    
+
+    /**
+     * 请求
+     *
+     * @param request  要求
+     * @param timeouts 超时
+     * @return {@link Response }
+     * @throws NacosException NacosException.
+     */
     @Override
     public Response request(Request request, long timeouts) throws NacosException {
         Payload grpcRequest = GrpcUtils.convert(request);
+        //
         ListenableFuture<Payload> requestFuture = grpcFutureServiceStub.request(grpcRequest);
         Payload grpcResponse;
         try {

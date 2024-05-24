@@ -35,7 +35,13 @@ public class DefaultSharePublisher extends DefaultPublisher implements ShardedEv
     private final Map<Class<? extends SlowEvent>, Set<Subscriber>> subMappings = new ConcurrentHashMap<>();
     
     private final Lock lock = new ReentrantLock();
-    
+
+    /**
+     * 添加订阅者
+     *
+     * @param subscriber    订阅人
+     * @param subscribeType 订阅类型
+     */
     @Override
     public void addSubscriber(Subscriber subscriber, Class<? extends Event> subscribeType) {
         // Actually, do a classification based on the slowEvent type.

@@ -70,7 +70,10 @@ public class NacosNamingService implements NamingService {
     private ServiceInfoHolder serviceInfoHolder;
     
     private InstancesChangeNotifier changeNotifier;
-    
+
+    /**
+     * 客户端代理
+     */
     private NamingClientProxy clientProxy;
     
     private String notifierEventScope;
@@ -84,7 +87,13 @@ public class NacosNamingService implements NamingService {
     public NacosNamingService(Properties properties) throws NacosException {
         init(properties);
     }
-    
+
+    /**
+     * 初始化
+     *
+     * @param properties 特性
+     * @throws NacosException NacosException.
+     */
     private void init(Properties properties) throws NacosException {
         final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties);
         
@@ -99,6 +108,7 @@ public class NacosNamingService implements NamingService {
         NotifyCenter.registerToPublisher(InstancesChangeEvent.class, 16384);
         NotifyCenter.registerSubscriber(changeNotifier);
         this.serviceInfoHolder = new ServiceInfoHolder(namespace, this.notifierEventScope, nacosClientProperties);
+        //创建 客户端代理
         this.clientProxy = new NamingClientProxyDelegate(this.namespace, serviceInfoHolder, nacosClientProperties, changeNotifier);
     }
     
@@ -139,6 +149,7 @@ public class NacosNamingService implements NamingService {
         instance.setPort(port);
         instance.setWeight(1.0);
         instance.setClusterName(clusterName);
+        //
         registerInstance(serviceName, groupName, instance);
     }
 

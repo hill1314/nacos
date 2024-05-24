@@ -71,23 +71,31 @@ public class NamingGrpcRedoService implements ConnectionEventListener {
     public boolean isConnected() {
         return connected;
     }
-    
+
+    /**
+     * 已连接
+     */
     @Override
     public void onConnected() {
         connected = true;
         LogUtils.NAMING_LOGGER.info("Grpc connection connect");
     }
-    
+
+    /**
+     * 连接已断开
+     */
     @Override
     public void onDisConnect() {
         connected = false;
         LogUtils.NAMING_LOGGER.warn("Grpc connection disconnect, mark to redo");
+
         synchronized (registeredInstances) {
             registeredInstances.values().forEach(instanceRedoData -> instanceRedoData.setRegistered(false));
         }
         synchronized (subscribes) {
             subscribes.values().forEach(subscriberRedoData -> subscriberRedoData.setRegistered(false));
         }
+
         LogUtils.NAMING_LOGGER.warn("mark to redo completed");
     }
     
