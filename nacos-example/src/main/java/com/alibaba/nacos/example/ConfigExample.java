@@ -32,15 +32,17 @@ import com.alibaba.nacos.api.exception.NacosException;
 public class ConfigExample {
 
     public static void main(String[] args) throws NacosException, InterruptedException {
-        String serverAddr = "localhost";
         String dataId = "test";
         String group = "DEFAULT_GROUP";
-        Properties properties = new Properties();
-        properties.put("serverAddr", serverAddr);
-        ConfigService configService = NacosFactory.createConfigService(properties);
-        String content = configService.getConfig(dataId, group, 5000);
-        System.out.println(content);
 
+        Properties properties = new Properties();
+        properties.put("serverAddr", "localhost");
+        ConfigService configService = NacosFactory.createConfigService(properties);
+
+        //获取配置
+        System.out.println(configService.getConfig(dataId, group, 5000));
+
+        //监听
         configService.addListener(dataId, group, new Listener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
@@ -53,19 +55,19 @@ public class ConfigExample {
             }
         });
 
+        //发布配置
         boolean isPublishOk = configService.publishConfig(dataId, group, "content");
         System.out.println(isPublishOk);
 
         Thread.sleep(3000);
-        content = configService.getConfig(dataId, group, 5000);
-        System.out.println(content);
+        System.out.println(configService.getConfig(dataId, group, 5000));
 
+        //删除配置
         boolean isRemoveOk = configService.removeConfig(dataId, group);
         System.out.println(isRemoveOk);
         Thread.sleep(3000);
 
-        content = configService.getConfig(dataId, group, 5000);
-        System.out.println(content);
+        System.out.println(configService.getConfig(dataId, group, 5000));
         Thread.sleep(300000);
 
     }

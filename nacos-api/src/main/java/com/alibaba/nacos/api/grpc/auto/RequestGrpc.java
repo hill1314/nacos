@@ -185,6 +185,10 @@ public final class RequestGrpc {
   }
 
   /**
+   * 异步请求 存根
+   *
+   * @author huleilei9
+   * @date 2024/05/24
    */
   public static final class RequestFutureStub extends io.grpc.stub.AbstractStub<RequestFutureStub> {
     private RequestFutureStub(io.grpc.Channel channel) {

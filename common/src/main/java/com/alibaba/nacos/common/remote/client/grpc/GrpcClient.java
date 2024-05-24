@@ -315,6 +315,12 @@ public abstract class GrpcClient extends RpcClient {
         }
     }
 
+    /**
+     * 连接到服务器
+     *
+     * @param serverInfo 服务器信息
+     * @return {@link Connection }
+     */
     @Override
     public Connection connectToServer(ServerInfo serverInfo) {
         try {

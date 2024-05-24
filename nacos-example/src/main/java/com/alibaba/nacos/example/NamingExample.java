@@ -45,7 +45,8 @@ public class NamingExample {
         properties.setProperty("namespace", System.getProperty("namespace", "public"));
         
         NamingService naming = NamingFactory.createNamingService(properties);
-        
+
+        //注册
         naming.registerInstance("nacos.test.3", "11.11.11.11", 8888, "TEST1");
         
         System.out.println("instances after register: " + naming.getAllInstances("nacos.test.3"));
@@ -56,7 +57,8 @@ public class NamingExample {
                     thread.setName("test-thread");
                     return thread;
                 });
-        
+
+        //订阅
         naming.subscribe("nacos.test.3", new AbstractEventListener() {
             
             //EventListener onEvent is sync to handle, If process too low in onEvent, maybe block other onEvent callback.
@@ -72,7 +74,8 @@ public class NamingExample {
                 System.out.println("instances from event: " + ((NamingEvent) event).getInstances());
             }
         });
-    
+
+        //注销
         naming.deregisterInstance("nacos.test.3", "11.11.11.11", 8888, "TEST1");
         
         Thread.sleep(1000);
