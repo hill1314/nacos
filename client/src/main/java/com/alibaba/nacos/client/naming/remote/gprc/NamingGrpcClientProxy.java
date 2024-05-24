@@ -115,7 +115,15 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     public Class<? extends Event> subscribeType() {
         return ServerListChangedEvent.class;
     }
-    
+
+    /**
+     * 注册服务
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param instance    例子
+     * @throws NacosException NacosException.
+     */
     @Override
     public void registerService(String serviceName, String groupName, Instance instance) throws NacosException {
         NAMING_LOGGER.info("[REGISTER-SERVICE] {} registering service {} with instance {}", namespaceId, serviceName,
