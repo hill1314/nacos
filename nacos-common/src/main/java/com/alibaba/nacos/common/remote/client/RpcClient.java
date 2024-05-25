@@ -829,9 +829,10 @@ public abstract class RpcClient implements Closeable {
      * @throws Exception exception when fail to connect to server.
      */
     public abstract Connection connectToServer(ServerInfo serverInfo) throws Exception;
-    
+
     /**
      * handle server request.
+     * 处理服务端请求（推送的消息）
      *
      * @param request request.
      * @return response.
@@ -843,6 +844,7 @@ public abstract class RpcClient implements Closeable {
         lastActiveTimeStamp = System.currentTimeMillis();
         for (ServerRequestHandler serverRequestHandler : serverRequestHandlers) {
             try {
+                //处理来自服务器的请求
                 Response response = serverRequestHandler.requestReply(request);
                 
                 if (response != null) {

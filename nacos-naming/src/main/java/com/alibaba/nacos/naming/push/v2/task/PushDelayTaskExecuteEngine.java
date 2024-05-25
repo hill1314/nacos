@@ -51,7 +51,9 @@ public class PushDelayTaskExecuteEngine extends NacosDelayTaskExecuteEngine {
     public PushDelayTaskExecuteEngine(ClientManager clientManager, ClientServiceIndexesManager indexesManager,
                                       ServiceStorage serviceStorage, NamingMetadataManager metadataManager,
                                       PushExecutor pushExecutor, SwitchDomain switchDomain) {
+        //创建线程池
         super(PushDelayTaskExecuteEngine.class.getSimpleName(), Loggers.PUSH);
+
         this.clientManager = clientManager;
         this.indexesManager = indexesManager;
         this.serviceStorage = serviceStorage;
@@ -101,6 +103,7 @@ public class PushDelayTaskExecuteEngine extends NacosDelayTaskExecuteEngine {
         public boolean process(NacosTask task) {
             PushDelayTask pushDelayTask = (PushDelayTask) task;
             Service service = pushDelayTask.getService();
+            //
             NamingExecuteTaskDispatcher.getInstance()
                     .dispatchAndExecuteTask(service, new PushExecuteTask(service, executeEngine, pushDelayTask));
             return true;

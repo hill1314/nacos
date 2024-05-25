@@ -35,6 +35,7 @@ import com.alibaba.nacos.naming.push.v2.hook.PushResultHookHolder;
 import java.util.Collection;
 
 /**
+ * Nacos命名推送执行任务
  * Nacos naming push execute task.
  *
  * @author xiweng.yy
@@ -56,7 +57,9 @@ public class PushExecuteTask extends AbstractExecuteTask {
     @Override
     public void run() {
         try {
+            //生成推送内容
             PushDataWrapper wrapper = generatePushData();
+
             ClientManager clientManager = delayTaskEngine.getClientManager();
             for (String each : getTargetClientIds()) {
                 Client client = clientManager.getClient(each);
@@ -64,18 +67,27 @@ public class PushExecuteTask extends AbstractExecuteTask {
                     // means this client has disconnect
                     continue;
                 }
+                //获取订阅者
                 Subscriber subscriber = clientManager.getClient(each).getSubscriber(service);
+                //执行推送
                 delayTaskEngine.getPushExecutor().doPushWithCallback(each, subscriber, wrapper,
                         new ServicePushCallback(each, subscriber, wrapper.getOriginalData(), delayTask.isPushToAll()));
             }
         } catch (Exception e) {
             Loggers.PUSH.error("Push task for service" + service.getGroupedServiceName() + " execute failed ", e);
+            //推送失败后，放到延迟任务队列
             delayTaskEngine.addTask(service, new PushDelayTask(service, 1000L));
         }
     }
-    
+
+    /**
+     * 生成推送数据
+     *
+     * @return {@link PushDataWrapper}
+     */
     private PushDataWrapper generatePushData() {
         ServiceInfo serviceInfo = delayTaskEngine.getServiceStorage().getPushData(service);
+        //服务元数据
         ServiceMetadata serviceMetadata = delayTaskEngine.getMetadataManager().getServiceMetadata(service).orElse(null);
         return new PushDataWrapper(serviceMetadata, serviceInfo);
     }

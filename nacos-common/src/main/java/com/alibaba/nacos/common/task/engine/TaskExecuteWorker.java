@@ -29,6 +29,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Nacos任务执行线程
  * Nacos execute task execute worker.
  *
  * @author xiweng.yy
@@ -44,7 +45,10 @@ public final class TaskExecuteWorker implements NacosTaskProcessor, Closeable {
     private final Logger log;
     
     private final String name;
-    
+
+    /**
+     * 任务队列
+     */
     private final BlockingQueue<Runnable> queue;
     
     private final AtomicBoolean closed;
@@ -116,6 +120,7 @@ public final class TaskExecuteWorker implements NacosTaskProcessor, Closeable {
         public void run() {
             while (!closed.get()) {
                 try {
+                    //获取队列中的任务
                     Runnable task = queue.take();
                     long begin = System.currentTimeMillis();
                     task.run();

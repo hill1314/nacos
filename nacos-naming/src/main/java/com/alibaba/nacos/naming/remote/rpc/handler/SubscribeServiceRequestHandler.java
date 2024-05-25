@@ -59,7 +59,15 @@ public class SubscribeServiceRequestHandler extends RequestHandler<SubscribeServ
         this.metadataManager = metadataManager;
         this.clientOperationService = clientOperationService;
     }
-    
+
+    /**
+     * 执行处理
+     *
+     * @param request 要求
+     * @param meta    元
+     * @return {@link SubscribeServiceResponse}
+     * @throws NacosException NacosException.
+     */
     @Override
     @Secured(action = ActionTypes.READ)
     public SubscribeServiceResponse handle(SubscribeServiceRequest request, RequestMeta meta) throws NacosException {
@@ -74,11 +82,15 @@ public class SubscribeServiceRequestHandler extends RequestHandler<SubscribeServ
         ServiceInfo serviceInfo = ServiceUtil.selectInstancesWithHealthyProtection(serviceStorage.getData(service),
                 metadataManager.getServiceMetadata(service).orElse(null), subscriber.getCluster(), false,
                 true, subscriber.getIp());
+
+        // 订阅服务
         if (request.isSubscribe()) {
             clientOperationService.subscribeService(service, subscriber, meta.getConnectionId());
+            //
             NotifyCenter.publishEvent(new SubscribeServiceTraceEvent(System.currentTimeMillis(),
                     meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));
         } else {
+            // 取消订阅服务
             clientOperationService.unsubscribeService(service, subscriber, meta.getConnectionId());
             NotifyCenter.publishEvent(new UnsubscribeServiceTraceEvent(System.currentTimeMillis(),
                     meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));

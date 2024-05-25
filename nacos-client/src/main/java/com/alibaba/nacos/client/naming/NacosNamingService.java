@@ -271,7 +271,7 @@ public class NacosNamingService implements NamingService {
      * @param serviceName 服务名称
      * @param groupName   组名称
      * @param clusters    集群
-     * @param subscribe   订阅
+     * @param subscribe   是否订阅
      * @return {@link List }<{@link Instance }>
      * @throws NacosException NacosException.
      */
@@ -430,7 +430,7 @@ public class NacosNamingService implements NamingService {
      * 订阅
      *
      * @param serviceName 服务名称
-     * @param listener    听众
+     * @param listener    监听事件
      * @throws NacosException NacosException.
      */
     @Override
@@ -447,7 +447,16 @@ public class NacosNamingService implements NamingService {
     public void subscribe(String serviceName, List<String> clusters, EventListener listener) throws NacosException {
         subscribe(serviceName, Constants.DEFAULT_GROUP, clusters, listener);
     }
-    
+
+    /**
+     * 主动订阅
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param clusters    集群
+     * @param listener    监听事件
+     * @throws NacosException NacosException.
+     */
     @Override
     public void subscribe(String serviceName, String groupName, List<String> clusters, EventListener listener)
             throws NacosException {
@@ -455,7 +464,9 @@ public class NacosNamingService implements NamingService {
             return;
         }
         String clusterString = StringUtils.join(clusters, ",");
+        //注册监听
         changeNotifier.registerListener(groupName, serviceName, clusterString, listener);
+        //远程调用 订阅
         clientProxy.subscribe(serviceName, groupName, clusterString);
     }
     

@@ -39,19 +39,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 为临时客户和服务提供操作服务
  * Operation service for ephemeral clients and services.
  *
  * @author xiweng.yy
  */
 @Component("ephemeralClientOperationService")
 public class EphemeralClientOperationServiceImpl implements ClientOperationService {
-    
+
+    /**
+     * 客户管理器
+     */
     private final ClientManager clientManager;
     
     public EphemeralClientOperationServiceImpl(ClientManagerDelegate clientManager) {
         this.clientManager = clientManager;
     }
-    
+
+    /**
+     * 注册实例
+     *
+     * @param service  服务
+     * @param instance 例子
+     * @param clientId 客户端id
+     * @throws NacosException NacosException.
+     */
     @Override
     public void registerInstance(Service service, Instance instance, String clientId) throws NacosException {
         NamingUtils.checkInstanceIsLegal(instance);
@@ -74,7 +86,14 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
         NotifyCenter
                 .publishEvent(new MetadataEvent.InstanceMetadataEvent(singleton, instanceInfo.getMetadataId(), false));
     }
-    
+
+    /**
+     * 批量注册实例
+     *
+     * @param service   服务
+     * @param instances 实例
+     * @param clientId  客户端id
+     */
     @Override
     public void batchRegisterInstance(Service service, List<Instance> instances, String clientId) {
         Service singleton = ServiceManager.getInstance().getSingleton(service);
@@ -100,7 +119,14 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
         NotifyCenter.publishEvent(
                 new MetadataEvent.InstanceMetadataEvent(singleton, batchInstancePublishInfo.getMetadataId(), false));
     }
-    
+
+    /**
+     * 取消注册实例
+     *
+     * @param service  服务
+     * @param instance 例子
+     * @param clientId 客户端id
+     */
     @Override
     public void deregisterInstance(Service service, Instance instance, String clientId) {
         if (!ServiceManager.getInstance().containSingleton(service)) {
@@ -121,7 +147,14 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
                     new MetadataEvent.InstanceMetadataEvent(singleton, removedInstance.getMetadataId(), true));
         }
     }
-    
+
+    /**
+     * 订阅服务
+     *
+     * @param service    服务
+     * @param subscriber 订阅人
+     * @param clientId   客户端id
+     */
     @Override
     public void subscribeService(Service service, Subscriber subscriber, String clientId) {
         Service singleton = ServiceManager.getInstance().getSingletonIfExist(service).orElse(service);
@@ -131,9 +164,18 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
         }
         client.addServiceSubscriber(singleton, subscriber);
         client.setLastUpdatedTime();
+
+        //ClientServiceIndexesManager 中有订阅该事件
         NotifyCenter.publishEvent(new ClientOperationEvent.ClientSubscribeServiceEvent(singleton, clientId));
     }
-    
+
+    /**
+     * 取消订阅服务
+     *
+     * @param service    服务
+     * @param subscriber 订阅人
+     * @param clientId   客户端id
+     */
     @Override
     public void unsubscribeService(Service service, Subscriber subscriber, String clientId) {
         Service singleton = ServiceManager.getInstance().getSingletonIfExist(service).orElse(service);
@@ -145,7 +187,14 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
         client.setLastUpdatedTime();
         NotifyCenter.publishEvent(new ClientOperationEvent.ClientUnsubscribeServiceEvent(singleton, clientId));
     }
-    
+
+    /**
+     * 客户是否合法
+     *
+     * @param client   客户
+     * @param clientId 客户端id
+     * @return boolean
+     */
     private boolean clientIsLegal(Client client, String clientId) {
         if (client == null) {
             Loggers.SRV_LOG.warn("Client connection {} already disconnect", clientId);

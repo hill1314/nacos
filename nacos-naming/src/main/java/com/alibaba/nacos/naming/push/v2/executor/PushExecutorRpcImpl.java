@@ -27,13 +27,17 @@ import com.alibaba.nacos.naming.utils.ServiceUtil;
 import org.springframework.stereotype.Component;
 
 /**
+ * rpc的推送执行服务。
  * Push execute service for rpc.
  *
  * @author xiweng.yy
  */
 @Component
 public class PushExecutorRpcImpl implements PushExecutor {
-    
+
+    /**
+     * 推送服务
+     */
     private final RpcPushService pushService;
     
     public PushExecutorRpcImpl(RpcPushService pushService) {
@@ -45,7 +49,15 @@ public class PushExecutorRpcImpl implements PushExecutor {
         pushService.pushWithoutAck(clientId,
                 NotifySubscriberRequest.buildNotifySubscriberRequest(getServiceInfo(data, subscriber)));
     }
-    
+
+    /**
+     * 使用回调进行推送
+     *
+     * @param clientId   客户端id
+     * @param subscriber 订阅人
+     * @param data       数据
+     * @param callBack   回调
+     */
     @Override
     public void doPushWithCallback(String clientId, Subscriber subscriber, PushDataWrapper data,
             NamingPushCallback callBack) {
@@ -54,7 +66,14 @@ public class PushExecutorRpcImpl implements PushExecutor {
         pushService.pushWithCallback(clientId, NotifySubscriberRequest.buildNotifySubscriberRequest(actualServiceInfo),
                 callBack, GlobalExecutor.getCallbackExecutor());
     }
-    
+
+    /**
+     * 获取服务信息
+     *
+     * @param data       数据
+     * @param subscriber 订阅人
+     * @return {@link ServiceInfo}
+     */
     private ServiceInfo getServiceInfo(PushDataWrapper data, Subscriber subscriber) {
         return ServiceUtil
                 .selectInstancesWithHealthyProtection(data.getOriginalData(), data.getServiceMetadata(), false, true,

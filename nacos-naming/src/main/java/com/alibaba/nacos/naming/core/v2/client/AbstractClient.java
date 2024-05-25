@@ -49,7 +49,7 @@ public abstract class AbstractClient implements Client {
     protected final ConcurrentHashMap<Service, InstancePublishInfo> publishers = new ConcurrentHashMap<>(16, 0.75f, 1);
 
     /**
-     * 当前客户端订阅的实例
+     * 当前客户端订阅的实例（一个订阅对应一个连接）
      */
     protected final ConcurrentHashMap<Service, Subscriber> subscribers = new ConcurrentHashMap<>(16, 0.75f, 1);
     

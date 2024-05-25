@@ -32,7 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractNacosTaskExecuteEngine<T extends NacosTask> implements NacosTaskExecuteEngine<T> {
     
     private final Logger log;
-    
+
+    /**
+     * 任务处理器(不同实现)
+     */
     private final ConcurrentHashMap<Object, NacosTaskProcessor> taskProcessors = new ConcurrentHashMap<>();
     
     private NacosTaskProcessor defaultTaskProcessor;

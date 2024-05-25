@@ -28,7 +28,10 @@ import com.alibaba.nacos.sys.env.EnvUtil;
 public class NamingExecuteTaskDispatcher {
     
     private static final NamingExecuteTaskDispatcher INSTANCE = new NamingExecuteTaskDispatcher();
-    
+
+    /**
+     * 执行引擎
+     */
     private final NacosExecuteTaskExecuteEngine executeEngine;
     
     private NamingExecuteTaskDispatcher() {
@@ -40,6 +43,7 @@ public class NamingExecuteTaskDispatcher {
     }
     
     public void dispatchAndExecuteTask(Object dispatchTag, AbstractExecuteTask task) {
+        //添加任务
         executeEngine.addTask(dispatchTag, task);
     }
     

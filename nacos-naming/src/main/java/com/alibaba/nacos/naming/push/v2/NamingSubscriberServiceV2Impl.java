@@ -53,9 +53,15 @@ public class NamingSubscriberServiceV2Impl extends SmartSubscriber implements Na
     private static final int PARALLEL_SIZE = 100;
     
     private final ClientManager clientManager;
-    
+
+    /**
+     * 索引管理器
+     */
     private final ClientServiceIndexesManager indexesManager;
-    
+
+    /**
+     * 延迟任务引擎
+     */
     private final PushDelayTaskExecuteEngine delayTaskEngine;
     
     public NamingSubscriberServiceV2Impl(ClientManagerDelegate clientManager,

@@ -317,7 +317,16 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
         result.setData(response.getServiceNames());
         return result;
     }
-    
+
+    /**
+     * 订阅
+     *
+     * @param serviceName 服务名称
+     * @param groupName   组名称
+     * @param clusters    集群
+     * @return {@link ServiceInfo}
+     * @throws NacosException NacosException.
+     */
     @Override
     public ServiceInfo subscribe(String serviceName, String groupName, String clusters) throws NacosException {
         if (NAMING_LOGGER.isDebugEnabled()) {
@@ -337,9 +346,11 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
      * @throws NacosException nacos exception
      */
     public ServiceInfo doSubscribe(String serviceName, String groupName, String clusters) throws NacosException {
-        SubscribeServiceRequest request = new SubscribeServiceRequest(namespaceId, groupName, serviceName, clusters,
-                true);
+        //
+        SubscribeServiceRequest request = new SubscribeServiceRequest(namespaceId, groupName, serviceName, clusters,true);
+        //
         SubscribeServiceResponse response = requestToServer(request, SubscribeServiceResponse.class);
+        //
         redoService.subscriberRegistered(serviceName, groupName, clusters);
         return response.getServiceInfo();
     }

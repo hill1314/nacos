@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 服务信息
  * Service POJO for Nacos v2.
  *
  * @author xiweng.yy
@@ -30,19 +31,45 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Service implements Serializable {
     
     private static final long serialVersionUID = -990509089519499344L;
-    
+
+    /**
+     * 命名空间
+     */
     private final String namespace;
-    
+
+    /**
+     * 组
+     */
     private final String group;
-    
+
+    /**
+     * 名称
+     */
     private final String name;
-    
+
+    /**
+     * 短暂
+     */
     private final boolean ephemeral;
-    
+
+    /**
+     * 修订版本
+     */
     private final AtomicLong revision;
-    
+
+    /**
+     * 上次更新时间
+     */
     private long lastUpdatedTime;
-    
+
+    /**
+     * 服务
+     *
+     * @param namespace 命名空间
+     * @param group     组
+     * @param name      名称
+     * @param ephemeral 短暂
+     */
     private Service(String namespace, String group, String name, boolean ephemeral) {
         this.namespace = namespace;
         this.group = group;
@@ -71,7 +98,7 @@ public class Service implements Serializable {
     public String getName() {
         return name;
     }
-    
+
     public boolean isEphemeral() {
         return ephemeral;
     }

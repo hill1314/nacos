@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 用于通知eventListener回调的订阅者。
  * A subscriber to notify eventListener callback.
  *
  * @author horizonzy
@@ -42,7 +43,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InstancesChangeNotifier extends Subscriber<InstancesChangeEvent> {
     
     private final String eventScope;
-    
+
+    /**
+     * 监听事件列表
+     */
     private final Map<String, ConcurrentHashSet<EventListener>> listenerMap = new ConcurrentHashMap<>();
     
     @JustForTest
@@ -65,6 +69,7 @@ public class InstancesChangeNotifier extends Subscriber<InstancesChangeEvent> {
     public void registerListener(String groupName, String serviceName, String clusters, EventListener listener) {
         String key = ServiceInfo.getKey(NamingUtils.getGroupedName(serviceName, groupName), clusters);
         ConcurrentHashSet<EventListener> eventListeners = listenerMap.computeIfAbsent(key, keyInner -> new ConcurrentHashSet<>());
+        //添加到监听列表
         eventListeners.add(listener);
     }
     
@@ -109,7 +114,12 @@ public class InstancesChangeNotifier extends Subscriber<InstancesChangeEvent> {
         }
         return serviceInfos;
     }
-    
+
+    /**
+     * 监听回调
+     *
+     * @param event 事件
+     */
     @Override
     public void onEvent(InstancesChangeEvent event) {
         String key = ServiceInfo
