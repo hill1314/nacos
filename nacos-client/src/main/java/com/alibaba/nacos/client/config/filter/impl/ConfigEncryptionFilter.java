@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
+ * 配置加密过滤器
  * Configure encryption filter.
  *
  * @author lixiaoshuang

@@ -40,7 +40,10 @@ import java.util.Map;
 
 @Service
 public class RequestHandlerRegistry implements ApplicationListener<ContextRefreshedEvent> {
-    
+
+    /**
+     * 处理程序 注册表
+     */
     Map<String, RequestHandler> registryHandlers = new HashMap<>();
     
     /**
@@ -82,6 +85,7 @@ public class RequestHandlerRegistry implements ApplicationListener<ContextRefres
             } catch (Exception e) {
                 //ignore.
             }
+            //这里获取的是 请求参数类型，而不是处理器类型
             Class tClass = (Class) ((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments()[0];
             registryHandlers.putIfAbsent(tClass.getSimpleName(), requestHandler);
         }

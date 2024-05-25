@@ -92,8 +92,10 @@ public class GrpcRequestAcceptor extends RequestGrpc.RequestImplBase {
             responseObserver.onCompleted();
             return;
         }
-        
+
+        //根据请求类型，获取对应的请求处理程序
         RequestHandler requestHandler = requestHandlerRegistry.getByRequestType(type);
+
         //no handler found.
         if (requestHandler == null) {
             Loggers.REMOTE_DIGEST.warn(String.format("[%s] No handler for request type : %s :", "grpc", type));
@@ -163,6 +165,7 @@ public class GrpcRequestAcceptor extends RequestGrpc.RequestImplBase {
             requestMeta.setClientVersion(connection.getMetaInfo().getVersion());
             requestMeta.setLabels(connection.getMetaInfo().getLabels());
             connectionManager.refreshActiveTime(requestMeta.getConnectionId());
+            //执行请求处理
             Response response = requestHandler.handleRequest(request, requestMeta);
             Payload payloadResponse = GrpcUtils.convert(response);
             traceIfNecessary(payloadResponse, false);

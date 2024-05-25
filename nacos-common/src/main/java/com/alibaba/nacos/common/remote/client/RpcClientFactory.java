@@ -36,7 +36,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RpcClientFactory {
     
     private static final Logger LOGGER = LoggerFactory.getLogger("com.alibaba.nacos.common.remote.client");
-    
+
+    /**
+     * 客户端 map，每个 taskId 对应一个
+     */
     private static final Map<String, RpcClient> CLIENT_MAP = new ConcurrentHashMap<>();
     
     /**

@@ -48,7 +48,7 @@ public class Service implements Serializable {
     private final String name;
 
     /**
-     * 短暂
+     * 是否为临时
      */
     private final boolean ephemeral;
 

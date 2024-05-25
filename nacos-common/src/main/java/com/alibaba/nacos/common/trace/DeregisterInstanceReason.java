@@ -27,14 +27,17 @@ public enum DeregisterInstanceReason {
      */
     REQUEST,
     /**
+     * 实例本机已断开连接。
      * Instance native disconnected.
      */
     NATIVE_DISCONNECTED,
     /**
+     * 实例同步已断开连接
      * Instance synced disconnected.
      */
     SYNCED_DISCONNECTED,
     /**
+     * 实例心跳超时过期
      * Instance heart beat timeout expire.
      */
     HEARTBEAT_EXPIRE,

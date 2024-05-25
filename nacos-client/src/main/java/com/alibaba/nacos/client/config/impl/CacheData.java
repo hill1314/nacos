@@ -43,9 +43,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 客户端缓存的实体对象
  * Listener Management.
  *
  * @author Nacos
+ * @date 2024/05/25
  */
 public class CacheData {
     
@@ -79,7 +81,10 @@ public class CacheData {
     public final String group;
     
     public final String tenant;
-    
+
+    /**
+     * 监听器
+     */
     private final CopyOnWriteArrayList<ManagerListenerWrap> listeners;
     
     private volatile String md5;
@@ -102,7 +107,11 @@ public class CacheData {
      * local cache change timestamp,for concurrent control.
      */
     private volatile AtomicLong lastModifiedTs = new AtomicLong(0);
-    
+
+    /**
+     * 任务id（所属分片ID）
+     * 客户端 会将监听的配置项 分为多个分片，每个分片对应一个taskId，每个分片分配一个与Nacos服务端的请求连接 判断数据是否发生变化
+     */
     private int taskId;
     
     private volatile boolean isInitializing = true;
@@ -282,6 +291,7 @@ public class CacheData {
     void checkListenerMd5() {
         for (ManagerListenerWrap wrap : listeners) {
             if (!md5.equals(wrap.lastCallMd5)) {
+                //不一致时 通知监听
                 safeNotifyListener(dataId, group, content, type, md5, encryptedDataKey, wrap);
             }
         }
@@ -298,7 +308,18 @@ public class CacheData {
         }
         return true;
     }
-    
+
+    /**
+     * 安全通知侦听器
+     *
+     * @param dataId           数据id
+     * @param group            组
+     * @param content          所容纳之物
+     * @param type             类型
+     * @param md5              md5
+     * @param encryptedDataKey 加密数据Key
+     * @param listenerWrap     侦听器包装
+     */
     private void safeNotifyListener(final String dataId, final String group, final String content, final String type,
             final String md5, final String encryptedDataKey, final ManagerListenerWrap listenerWrap) {
         final Listener listener = listenerWrap.listener;
@@ -407,7 +428,12 @@ public class CacheData {
     public void setSyncWithServer(boolean syncWithServer) {
         isSyncWithServer = syncWithServer;
     }
-    
+
+    /**
+     * 是否丢弃
+     *
+     * @return boolean
+     */
     public boolean isDiscard() {
         return isDiscard;
     }

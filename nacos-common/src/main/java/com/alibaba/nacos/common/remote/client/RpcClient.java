@@ -663,8 +663,9 @@ public abstract class RpcClient implements Closeable {
                             "Client not connected, current status:" + rpcClientStatus.get());
                 }
 
-                //执行请求
+                //执行请求（GrpcConnection）
                 response = this.currentConnection.request(request, timeoutMills);
+
                 if (response == null) {
                     throw new NacosException(SERVER_ERROR, "Unknown Exception.");
                 }

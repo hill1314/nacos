@@ -106,7 +106,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         String autoTag = configQueryRequest.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
         
         String requestIpApp = meta.getLabels().get(CLIENT_APPNAME_HEADER);
-        
+
+        //读锁
         int lockResult = tryConfigReadLock(groupKey);
         
         boolean isBeta = false;
@@ -116,8 +117,10 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
             try {
                 String md5 = Constants.NULL;
                 long lastModified = 0L;
+                //先从缓存中获取
                 CacheItem cacheItem = ConfigCacheService.getContentCache(groupKey);
                 if (cacheItem != null) {
+                    //灰度判断
                     if (cacheItem.isBeta()) {
                         if (cacheItem.getIps4Beta().contains(clientIp)) {
                             isBeta = true;
@@ -126,12 +129,16 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
                     String configType = cacheItem.getType();
                     response.setContentType((null != configType) ? configType : "text");
                 }
+
                 File file = null;
                 ConfigInfoBase configInfoBase = null;
                 PrintWriter out = null;
+
+                //灰度模式
                 if (isBeta) {
                     md5 = cacheItem.getMd54Beta();
                     lastModified = cacheItem.getLastModifiedTs4Beta();
+                    //是否从磁盘读取
                     if (PropertyUtil.isDirectRead()) {
                         configInfoBase = configInfoBetaPersistService.findConfigInfo4Beta(dataId, group, tenant);
                     } else {
@@ -139,6 +146,7 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
                     }
                     response.setBeta(true);
                 } else {
+                    //非 灰度模式，tag 判断
                     if (StringUtils.isBlank(tag)) {
                         if (isUseTag(cacheItem, autoTag)) {
                             if (cacheItem != null) {
@@ -289,17 +297,23 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
     private static boolean fileNotExist(File file) {
         return file == null || !file.exists();
     }
-    
+
+    /**
+     * 带自旋的读锁
+     *
+     * @param groupKey 组Key
+     * @return int
+     */
     private static int tryConfigReadLock(String groupKey) {
         
         // Lock failed by default.
         int lockResult = -1;
         
-        // Try to get lock times, max value: 10;
+        // Try to get lock times, max value: 10; 自旋10次
         for (int i = TRY_GET_LOCK_TIMES; i >= 0; --i) {
             lockResult = ConfigCacheService.tryReadLock(groupKey);
             
-            // The data is non-existent.
+            // The data is non-existent. 数据不存在
             if (0 == lockResult) {
                 break;
             }
@@ -312,6 +326,7 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
             // Retry.
             if (i > 0) {
                 try {
+                    //睡眠1ms 再重试
                     Thread.sleep(1);
                 } catch (Exception e) {
                     LogUtil.PULL_CHECK_LOG.error("An Exception occurred while thread sleep", e);

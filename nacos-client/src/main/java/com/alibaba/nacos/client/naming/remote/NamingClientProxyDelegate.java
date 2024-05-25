@@ -173,6 +173,8 @@ public class NamingClientProxyDelegate implements NamingClientProxy {
         if (null == result || !isSubscribed(serviceName, groupName, clusters)) {
             result = grpcClientProxy.subscribe(serviceName, groupName, clusters);
         }
+
+        //保存服务信息到 ServiceInfoHolder的本地缓存
         serviceInfoHolder.processServiceInfo(result);
         return result;
     }

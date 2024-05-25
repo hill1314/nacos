@@ -58,7 +58,12 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
                 .scheduleExpiredClientCleaner(new ExpiredClientCleaner(this), 0, Constants.DEFAULT_HEART_BEAT_INTERVAL,
                         TimeUnit.MILLISECONDS);
     }
-    
+
+    /**
+     * 客户端已连接
+     *
+     * @param connect 连接
+     */
     @Override
     public void clientConnected(Connection connect) {
         if (!RemoteConstants.LABEL_MODULE_NAMING.equals(connect.getMetaInfo().getLabel(RemoteConstants.LABEL_MODULE))) {

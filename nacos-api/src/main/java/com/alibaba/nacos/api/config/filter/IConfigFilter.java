@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import java.util.Properties;
 
 /**
+ * 配置过滤器
  * Config Filter Interface.
  *
  * <p>DO NOT implement this interface directly, you should extend <code>AbstractConfigFilter</code>.

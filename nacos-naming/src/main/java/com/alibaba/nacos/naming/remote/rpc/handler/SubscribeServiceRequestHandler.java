@@ -46,11 +46,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SubscribeServiceRequestHandler extends RequestHandler<SubscribeServiceRequest, SubscribeServiceResponse> {
-    
+
+    /**
+     * 服务存储器
+     */
     private final ServiceStorage serviceStorage;
-    
+
+    /**
+     * 元数据管理器
+     */
     private final NamingMetadataManager metadataManager;
-    
+
+    /**
+     * 客户端操作服务
+     */
     private final EphemeralClientOperationServiceImpl clientOperationService;
     
     public SubscribeServiceRequestHandler(ServiceStorage serviceStorage, NamingMetadataManager metadataManager,
@@ -79,19 +88,23 @@ public class SubscribeServiceRequestHandler extends RequestHandler<SubscribeServ
         Service service = Service.newService(namespaceId, groupName, serviceName, true);
         Subscriber subscriber = new Subscriber(meta.getClientIp(), meta.getClientVersion(), app, meta.getClientIp(),
                 namespaceId, groupedServiceName, 0, request.getClusters());
+
+        //获取服务信息
         ServiceInfo serviceInfo = ServiceUtil.selectInstancesWithHealthyProtection(serviceStorage.getData(service),
                 metadataManager.getServiceMetadata(service).orElse(null), subscriber.getCluster(), false,
                 true, subscriber.getIp());
 
-        // 订阅服务
         if (request.isSubscribe()) {
+            // 订阅服务
             clientOperationService.subscribeService(service, subscriber, meta.getConnectionId());
-            //
+            //发布事件
             NotifyCenter.publishEvent(new SubscribeServiceTraceEvent(System.currentTimeMillis(),
                     meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));
         } else {
             // 取消订阅服务
             clientOperationService.unsubscribeService(service, subscriber, meta.getConnectionId());
+
+            //发布事件
             NotifyCenter.publishEvent(new UnsubscribeServiceTraceEvent(System.currentTimeMillis(),
                     meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));
         }

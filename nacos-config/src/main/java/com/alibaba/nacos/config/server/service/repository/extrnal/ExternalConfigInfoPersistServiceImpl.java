@@ -149,11 +149,15 @@ public class ExternalConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
             final Timestamp time, final Map<String, Object> configAdvanceInfo, final boolean notify) {
         tjt.execute(status -> {
             try {
+                //添加数据
                 long configId = addConfigInfoAtomic(-1, srcIp, srcUser, configInfo, time, configAdvanceInfo);
                 String configTags = configAdvanceInfo == null ? null : (String) configAdvanceInfo.get("config_tags");
+
+                //添加标签关系
                 addConfigTagsRelation(configId, configTags, configInfo.getDataId(), configInfo.getGroup(),
                         configInfo.getTenant());
-                
+
+                //添加历史记录
                 historyConfigInfoPersistService.insertConfigHistoryAtomic(0, configInfo, srcIp, srcUser, time, "I");
             } catch (CannotGetJdbcConnectionException e) {
                 LogUtil.FATAL_LOG.error("[db-error] " + e, e);
@@ -168,7 +172,17 @@ public class ExternalConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
             Map<String, Object> configAdvanceInfo) {
         insertOrUpdate(srcIp, srcUser, configInfo, time, configAdvanceInfo, true);
     }
-    
+
+    /**
+     * 插入或更新
+     *
+     * @param srcIp             src-ip
+     * @param srcUser           src用户
+     * @param configInfo        配置信息
+     * @param time              时间
+     * @param configAdvanceInfo 配置高级信息
+     * @param notify            通知
+     */
     @Override
     public void insertOrUpdate(String srcIp, String srcUser, ConfigInfo configInfo, Timestamp time,
             Map<String, Object> configAdvanceInfo, boolean notify) {
@@ -195,7 +209,18 @@ public class ExternalConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
             return updateConfigInfoCas(configInfo, srcIp, srcUser, time, configAdvanceInfo, notify);
         }
     }
-    
+
+    /**
+     * 原子添加配置信息
+     *
+     * @param configId          配置id
+     * @param srcIp             src-ip
+     * @param srcUser           src用户
+     * @param configInfo        配置信息
+     * @param time              时间
+     * @param configAdvanceInfo 配置高级信息
+     * @return long
+     */
     @Override
     public long addConfigInfoAtomic(final long configId, final String srcIp, final String srcUser,
             final ConfigInfo configInfo, final Timestamp time, Map<String, Object> configAdvanceInfo) {

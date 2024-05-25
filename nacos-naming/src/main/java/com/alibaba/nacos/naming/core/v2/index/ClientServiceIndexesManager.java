@@ -46,27 +46,33 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Component
 public class ClientServiceIndexesManager extends SmartSubscriber {
-    
+
+    /**
+     * 发布者索引
+     */
     private final ConcurrentMap<Service, Set<String>> publisherIndexes = new ConcurrentHashMap<>();
-    
+
+    /**
+     * 订阅者索引
+     */
     private final ConcurrentMap<Service, Set<String>> subscriberIndexes = new ConcurrentHashMap<>();
-    
+
     public ClientServiceIndexesManager() {
         NotifyCenter.registerSubscriber(this, NamingEventPublisherFactory.getInstance());
     }
-    
+
     public Collection<String> getAllClientsRegisteredService(Service service) {
         return publisherIndexes.containsKey(service) ? publisherIndexes.get(service) : new ConcurrentHashSet<>();
     }
-    
+
     public Collection<String> getAllClientsSubscribeService(Service service) {
         return subscriberIndexes.containsKey(service) ? subscriberIndexes.get(service) : new ConcurrentHashSet<>();
     }
-    
+
     public Collection<Service> getSubscribedService() {
         return subscriberIndexes.keySet();
     }
-    
+
     /**
      * Clear the service index without instances.
      *
@@ -77,32 +83,56 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             publisherIndexes.remove(service);
         }
     }
-    
+
+    /**
+     * 订阅事件类型
+     *
+     * @return {@link List}<{@link Class}<{@link ?} {@link extends} {@link Event}>>
+     */
     @Override
     public List<Class<? extends Event>> subscribeTypes() {
         List<Class<? extends Event>> result = new LinkedList<>();
+        //客户端注册事件
         result.add(ClientOperationEvent.ClientRegisterServiceEvent.class);
+        //客户端取消注册事件
         result.add(ClientOperationEvent.ClientDeregisterServiceEvent.class);
+        //客户端订阅事件
         result.add(ClientOperationEvent.ClientSubscribeServiceEvent.class);
+        //客户端取消订阅事件
         result.add(ClientOperationEvent.ClientUnsubscribeServiceEvent.class);
+        //客户端断开连接事件
         result.add(ClientEvent.ClientDisconnectEvent.class);
         return result;
     }
-    
+
+    /**
+     * 事件回调
+     *
+     * @param event 事件
+     */
     @Override
     public void onEvent(Event event) {
         if (event instanceof ClientEvent.ClientDisconnectEvent) {
+            //断开连接
             handleClientDisconnect((ClientEvent.ClientDisconnectEvent) event);
         } else if (event instanceof ClientOperationEvent) {
+            //客户端操作事件(包括 注册、取消注册、订阅、取消订阅)
             handleClientOperation((ClientOperationEvent) event);
         }
     }
-    
+
+    /**
+     * 处理客户端断开连接事件
+     *
+     * @param event 事件
+     */
     private void handleClientDisconnect(ClientEvent.ClientDisconnectEvent event) {
         Client client = event.getClient();
+        //告知该客户端的订阅者，该客户端已经断开连接
         for (Service each : client.getAllSubscribeService()) {
             removeSubscriberIndexes(each, client.getClientId());
         }
+
         DeregisterInstanceReason reason = event.isNative()
                 ? DeregisterInstanceReason.NATIVE_DISCONNECTED : DeregisterInstanceReason.SYNCED_DISCONNECTED;
         long currentTimeMillis = System.currentTimeMillis();
@@ -114,7 +144,7 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
                     instance.getIp(), instance.getPort()));
         }
     }
-    
+
     private void handleClientOperation(ClientOperationEvent event) {
         Service service = event.getService();
         String clientId = event.getClientId();
@@ -128,13 +158,19 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             removeSubscriberIndexes(service, clientId);
         }
     }
-    
+
     private void addPublisherIndexes(Service service, String clientId) {
         publisherIndexes.computeIfAbsent(service, key -> new ConcurrentHashSet<>());
         publisherIndexes.get(service).add(clientId);
         NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service, true));
     }
-    
+
+    /**
+     * 删除发布者索引
+     *
+     * @param service  服务
+     * @param clientId 客户端id
+     */
     private void removePublisherIndexes(Service service, String clientId) {
         publisherIndexes.computeIfPresent(service, (s, ids) -> {
             ids.remove(clientId);
@@ -142,7 +178,7 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             return ids.isEmpty() ? null : ids;
         });
     }
-    
+
     private void addSubscriberIndexes(Service service, String clientId) {
         subscriberIndexes.computeIfAbsent(service, key -> new ConcurrentHashSet<>());
         // Fix #5404, Only first time add need notify event.
@@ -150,7 +186,7 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             NotifyCenter.publishEvent(new ServiceEvent.ServiceSubscribedEvent(service, clientId));
         }
     }
-    
+
     private void removeSubscriberIndexes(Service service, String clientId) {
         if (!subscriberIndexes.containsKey(service)) {
             return;

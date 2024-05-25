@@ -22,6 +22,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * tps控制管理器
  * tps control manager.
  *
  * @author liuzunfei

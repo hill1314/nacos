@@ -63,6 +63,8 @@ public class NacosConfigService implements ConfigService {
     ServerHttpAgent agent = null;
     
     /**
+     * 客户端长链接工作线程
+     * （实现客户端长链接，定时发送心跳，同时实现客户端的读写功能）
      * long polling.
      */
     private final ClientWorker worker;
@@ -152,7 +154,17 @@ public class NacosConfigService implements ConfigService {
     public void removeListener(String dataId, String group, Listener listener) {
         worker.removeTenantListener(dataId, group, listener);
     }
-    
+
+    /**
+     * 获取配置
+     *
+     * @param tenant    房客
+     * @param dataId    数据id
+     * @param group     组
+     * @param timeoutMs 超时ms
+     * @return {@link String}
+     * @throws NacosException NacosException.
+     */
     private String getConfigInner(String tenant, String dataId, String group, long timeoutMs) throws NacosException {
         group = blank2defaultGroup(group);
         ParamUtils.checkKeyParam(dataId, group);
@@ -167,6 +179,8 @@ public class NacosConfigService implements ConfigService {
         // but is maintained by user.
         // This is designed for certain scenario like client emergency reboot,
         // changing config needed in the same time, while nacos server is down.
+
+        //1. 先从本地（文件系统）获取
         String content = LocalConfigInfoProcessor.getFailover(worker.getAgentName(), dataId, group, tenant);
         if (content != null) {
             LOGGER.warn("[{}] [get-config] get failover ok, dataId={}, group={}, tenant={}, config={}",
@@ -181,6 +195,7 @@ public class NacosConfigService implements ConfigService {
         }
         
         try {
+            //2. 从nacos server获取
             ConfigResponse response = worker.getServerConfig(dataId, group, tenant, timeoutMs, false);
             cr.setContent(response.getContent());
             cr.setEncryptedDataKey(response.getEncryptedDataKey());
@@ -196,6 +211,7 @@ public class NacosConfigService implements ConfigService {
                     worker.getAgentName(), dataId, group, tenant, ioe.toString());
         }
 
+        //3. 从快照中获取
         content = LocalConfigInfoProcessor.getSnapshot(worker.getAgentName(), dataId, group, tenant);
         if (content != null) {
             LOGGER.warn("[{}] [get-config] get snapshot ok, dataId={}, group={}, tenant={}, config={}",
@@ -224,19 +240,23 @@ public class NacosConfigService implements ConfigService {
             String betaIps, String content, String type, String casMd5) throws NacosException {
         group = blank2defaultGroup(group);
         ParamUtils.checkParam(dataId, group, content);
-        
+
+        //配置请求
         ConfigRequest cr = new ConfigRequest();
         cr.setDataId(dataId);
         cr.setTenant(tenant);
         cr.setGroup(group);
         cr.setContent(content);
         cr.setType(type);
+
+        //配置过滤器（实现加密等）
         configFilterChainManager.doFilter(cr, null);
+
         content = cr.getContent();
         String encryptedDataKey = cr.getEncryptedDataKey();
-        
-        return worker
-                .publishConfig(dataId, group, tenant, appName, tag, betaIps, content, encryptedDataKey, casMd5, type);
+
+        //发布配置
+        return worker.publishConfig(dataId, group, tenant, appName, tag, betaIps, content, encryptedDataKey, casMd5, type);
     }
     
     @Override

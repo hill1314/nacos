@@ -46,6 +46,7 @@ import java.util.Arrays;
 import static com.alibaba.nacos.config.server.service.repository.RowMapperManager.CONFIG_INFO_TAG_WRAPPER_ROW_MAPPER;
 
 /**
+ * 外部存储器
  * ExternalConfigInfoTagPersistServiceImpl.
  *
  * @author lixiaoshuang
@@ -96,7 +97,17 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
+    /**
+     * 插入或更新标记
+     *
+     * @param configInfo 配置信息
+     * @param tag        标签
+     * @param srcIp      src-ip
+     * @param srcUser    src用户
+     * @param time       时间
+     * @param notify     通知
+     */
     @Override
     public void insertOrUpdateTag(final ConfigInfo configInfo, final String tag, final String srcIp,
             final String srcUser, final Timestamp time, final boolean notify) {

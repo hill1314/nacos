@@ -66,16 +66,25 @@ public class NacosNamingService implements NamingService {
     private String namespace;
     
     private String logName;
-    
+
+    /**
+     * 服务信息持有者
+     */
     private ServiceInfoHolder serviceInfoHolder;
-    
+
+    /**
+     * 变更通知程序
+     */
     private InstancesChangeNotifier changeNotifier;
 
     /**
      * 客户端代理
      */
     private NamingClientProxy clientProxy;
-    
+
+    /**
+     * 通知程序事件范围
+     */
     private String notifierEventScope;
     
     public NacosNamingService(String serverList) throws NacosException {
@@ -107,6 +116,8 @@ public class NacosNamingService implements NamingService {
         this.changeNotifier = new InstancesChangeNotifier(this.notifierEventScope);
         NotifyCenter.registerToPublisher(InstancesChangeEvent.class, 16384);
         NotifyCenter.registerSubscriber(changeNotifier);
+
+        //
         this.serviceInfoHolder = new ServiceInfoHolder(namespace, this.notifierEventScope, nacosClientProperties);
         //创建 客户端代理
         this.clientProxy = new NamingClientProxyDelegate(this.namespace, serviceInfoHolder, nacosClientProperties, changeNotifier);

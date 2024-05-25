@@ -33,7 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author xiweng.yy
  */
 public class ServiceManager {
-    
+
+    /**
+     * 单例
+     */
     private static final ServiceManager INSTANCE = new ServiceManager();
 
     /**
@@ -42,7 +45,7 @@ public class ServiceManager {
     private final ConcurrentHashMap<Service, Service> singletonRepository;
 
     /**
-     * 命名空间单例映射
+     * 命名空间下 服务列表
      */
     private final ConcurrentHashMap<String, Set<Service>> namespaceSingletonMaps;
     
@@ -55,22 +58,33 @@ public class ServiceManager {
     public static ServiceManager getInstance() {
         return INSTANCE;
     }
-    
+
+    /**
+     * 获取命名空间下的服务列表
+     *
+     * @param namespace 命名空间
+     * @return {@link Set}<{@link Service}>
+     */
     public Set<Service> getSingletons(String namespace) {
         return namespaceSingletonMaps.getOrDefault(namespace, new HashSet<>(1));
     }
     
     /**
+     * 获取单个服务信息，
+     * 其实返回的就是 传入的 service 本身，但是获取的同时会进行 服务元数据注册、并保存到对应的命名空间缓存下
      * Get singleton service. Put to manager if no singleton.
      *
      * @param service new service
      * @return if service is exist, return exist service, otherwise return new service
      */
     public Service getSingleton(Service service) {
+        //
         singletonRepository.computeIfAbsent(service, key -> {
+            //发布一个服务元数据注册事件
             NotifyCenter.publishEvent(new MetadataEvent.ServiceMetadataEvent(service, false));
             return service;
         });
+
         Service result = singletonRepository.get(service);
         namespaceSingletonMaps.computeIfAbsent(result.getNamespace(), namespace -> new ConcurrentHashSet<>());
         namespaceSingletonMaps.get(result.getNamespace()).add(result);

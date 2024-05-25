@@ -57,11 +57,20 @@ public class ServiceInfoHolder implements Closeable {
     private static final String FILE_PATH_NAMING = "naming";
     
     private static final String USER_HOME_PROPERTY = "user.home";
-    
+
+    /**
+     * 服务信息map
+     */
     private final ConcurrentMap<String, ServiceInfo> serviceInfoMap;
-    
+
+    /**
+     * 故障转移反应
+     */
     private final FailoverReactor failoverReactor;
-    
+
+    /**
+     * 推空保护
+     */
     private final boolean pushEmptyProtection;
     
     private String cacheDir;
@@ -186,7 +195,14 @@ public class ServiceInfoHolder implements Closeable {
     private boolean isEmptyOrErrorPush(ServiceInfo serviceInfo) {
         return null == serviceInfo.getHosts() || (pushEmptyProtection && !serviceInfo.validate());
     }
-    
+
+    /**
+     * 服务信息是否已更改
+     *
+     * @param oldService 旧服务
+     * @param newService 新服务
+     * @return boolean
+     */
     private boolean isChangedServiceInfo(ServiceInfo oldService, ServiceInfo newService) {
         if (null == oldService) {
             NAMING_LOGGER.info("init new ips({}) service: {} -> {}", newService.ipCount(), newService.getKey(),

@@ -27,9 +27,10 @@ import com.alibaba.nacos.api.naming.NamingService;
 import java.util.Properties;
 
 /**
- * Nacos Factory.
+ * Nacos Factory. 总工厂
  *
  * @author Nacos
+ * @date 2024/05/25
  */
 public class NacosFactory {
     

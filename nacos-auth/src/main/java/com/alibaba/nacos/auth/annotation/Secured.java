@@ -26,6 +26,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * 指示应授权已注释请求的注释。
  * Annotation indicating that the annotated request should be authorized.
  *
  * @author nkorange

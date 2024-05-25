@@ -99,6 +99,10 @@ public final class RequestGrpc {
   }
 
   /**
+   * 要求实现类基础
+   *
+   * @author huleilei9
+   * @date 2024/05/25
    */
   public static abstract class RequestImplBase implements io.grpc.BindableService {
 
@@ -126,6 +130,10 @@ public final class RequestGrpc {
   }
 
   /**
+   * 请求存根
+   *
+   * @author huleilei9
+   * @date 2024/05/25
    */
   public static final class RequestStub extends io.grpc.stub.AbstractStub<RequestStub> {
     private RequestStub(io.grpc.Channel channel) {

@@ -43,6 +43,7 @@ import java.util.Arrays;
 import static com.alibaba.nacos.config.server.service.repository.RowMapperManager.CONFIG_INFO_TAG_WRAPPER_ROW_MAPPER;
 
 /**
+ * 内置存储器（derby）
  * EmbeddedConfigInfoTagPersistServiceImpl.
  *
  * @author lixiaoshuang

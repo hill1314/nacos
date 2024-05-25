@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 发布配置 请求处理程序
+ * （处理 ConfigPublishRequest 请求，返回 ConfigPublishResponse）
  * request handler to publish config.
  *
  * @author liuzunfei
@@ -68,7 +70,15 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
         this.configInfoTagPersistService = configInfoTagPersistService;
         this.configInfoBetaPersistService = configInfoBetaPersistService;
     }
-    
+
+    /**
+     * 针对 ConfigPublishRequest 请求的处理 ， 配置发布
+     *
+     * @param request 要求
+     * @param meta
+     * @return {@link ConfigPublishResponse}
+     * @throws NacosException NacosException.
+     */
     @Override
     @TpsControl(pointName = "ConfigPublish")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG)
@@ -111,12 +121,16 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             configInfo.setMd5(request.getCasMd5());
             configInfo.setType(type);
             configInfo.setEncryptedDataKey(encryptedDataKey);
+
+            //灰度发布 IP列表
             String betaIps = request.getAdditionParam("betaIps");
             if (StringUtils.isBlank(betaIps)) {
+                //是否带有标签
                 if (StringUtils.isBlank(tag)) {
+                    //是否有MD5比较
                     if (StringUtils.isNotBlank(request.getCasMd5())) {
-                        boolean casSuccess = configInfoPersistService
-                                .insertOrUpdateCas(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
+                        //保存配置
+                        boolean casSuccess = configInfoPersistService.insertOrUpdateCas(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
                         if (!casSuccess) {
                             return ConfigPublishResponse.buildFailResponse(ResponseCode.FAIL.getCode(),
                                     "Cas publish fail,server md5 may have changed.");
@@ -127,6 +141,7 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                     ConfigChangePublisher.notifyConfigChange(
                             new ConfigDataChangeEvent(false, dataId, group, tenant, time.getTime()));
                 } else {
+
                     if (StringUtils.isNotBlank(request.getCasMd5())) {
                         boolean casSuccess = configInfoTagPersistService
                                 .insertOrUpdateTagCas(configInfo, tag, srcIp, srcUser, time, false);
@@ -136,10 +151,10 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                         }
                     } else {
                         configInfoTagPersistService.insertOrUpdateTag(configInfo, tag, srcIp, srcUser, time, false);
-                        
                     }
-                    ConfigChangePublisher.notifyConfigChange(
-                            new ConfigDataChangeEvent(false, dataId, group, tenant, tag, time.getTime()));
+
+                    //发布 数据变更事件（因为每个nacos 实例本地都有两份缓存：内存缓存、磁盘缓存，发布事件 用来通知其他实例进行数据同步）
+                    ConfigChangePublisher.notifyConfigChange(new ConfigDataChangeEvent(false, dataId, group, tenant, tag, time.getTime()));
                 }
             } else {
                 // beta publish
@@ -154,8 +169,7 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                     configInfoBetaPersistService.insertOrUpdateBeta(configInfo, betaIps, srcIp, srcUser, time, false);
                     
                 }
-                ConfigChangePublisher
-                        .notifyConfigChange(new ConfigDataChangeEvent(true, dataId, group, tenant, time.getTime()));
+                ConfigChangePublisher.notifyConfigChange(new ConfigDataChangeEvent(true, dataId, group, tenant, time.getTime()));
             }
             ConfigTraceService
                     .logPersistenceEvent(dataId, group, tenant, requestIpApp, time.getTime(), InetUtils.getSelfIP(),

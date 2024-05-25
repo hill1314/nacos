@@ -24,21 +24,23 @@ import com.alibaba.nacos.core.utils.Loggers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * 请求处理器
  * Nacos based request handler.
  *
  * @author liuzunfei
  * @author xiweng.yy
+ * @date 2024/05/25
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class RequestHandler<T extends Request, S extends Response> {
     
     @Autowired
     private RequestFilters requestFilters;
-    
+
     /**
      * Handler request.
      *
-     * @param request request
+     * @param request 要处理的请求类型
      * @param meta    request meta data
      * @return response
      * @throws NacosException nacos exception when handle request has problem.

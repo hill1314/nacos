@@ -41,7 +41,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.4.1
  */
 public class InstancesChangeNotifier extends Subscriber<InstancesChangeEvent> {
-    
+
+    /**
+     * 事件范围
+     */
     private final String eventScope;
 
     /**
