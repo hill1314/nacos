@@ -138,6 +138,8 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                     } else {
                         configInfoPersistService.insertOrUpdate(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
                     }
+
+                    //配置发生变更 事件通知 (AsyncNotifyService 中监听)
                     ConfigChangePublisher.notifyConfigChange(
                             new ConfigDataChangeEvent(false, dataId, group, tenant, time.getTime()));
                 } else {

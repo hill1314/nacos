@@ -116,7 +116,10 @@ public abstract class DumpService {
      * full dump delay.
      */
     static final int INITIAL_DELAY_IN_MINUTE = 6 * 60;
-    
+
+    /**
+     *
+     */
     private TaskManager dumpTaskMgr;
     
     private TaskManager dumpAllTaskMgr;
@@ -406,6 +409,7 @@ public abstract class DumpService {
     public void dump(String dataId, String group, String tenant, long lastModified, String handleIp, boolean isBeta) {
         String groupKey = GroupKey2.getKey(dataId, group, tenant);
         String taskKey = String.join("+", dataId, group, tenant, String.valueOf(isBeta));
+        //添加 DumpTask任务（DumpProcessor中做处理）
         dumpTaskMgr.addTask(taskKey, new DumpTask(groupKey, lastModified, handleIp, isBeta));
         DUMP_LOG.info("[dump-task] add task. groupKey={}, taskKey={}", groupKey, taskKey);
     }

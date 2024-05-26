@@ -90,7 +90,8 @@ public class AsyncNotifyService {
                     String tag = evt.tag;
                     
                     MetricsMonitor.incrementConfigChangeCount(tenant, group, dataId);
-                    
+
+                    //集群节点列表
                     Collection<Member> ipList = memberManager.allMembers();
                     
                     // In fact, any type of queue here can be
@@ -98,10 +99,10 @@ public class AsyncNotifyService {
                     
                     for (Member member : ipList) {
                         // grpc report data change only
-                        rpcQueue.add(
-                                new NotifySingleRpcTask(dataId, group, tenant, tag, dumpTs, evt.isBeta, member));
+                        rpcQueue.add(new NotifySingleRpcTask(dataId, group, tenant, tag, dumpTs, evt.isBeta, member));
                     }
                     if (!rpcQueue.isEmpty()) {
+                        //执行异步任务
                         ConfigExecutor.executeAsyncNotify(new AsyncRpcTask(rpcQueue));
                     }
                     
@@ -116,7 +117,10 @@ public class AsyncNotifyService {
     }
     
     class AsyncRpcTask implements Runnable {
-        
+
+        /**
+         * 队列
+         */
         private Queue<NotifySingleRpcTask> queue;
         
         public AsyncRpcTask(Queue<NotifySingleRpcTask> queue) {
@@ -135,8 +139,10 @@ public class AsyncNotifyService {
                 syncRequest.setLastModified(task.getLastModified());
                 syncRequest.setTag(task.tag);
                 syncRequest.setTenant(task.getTenant());
+
                 Member member = task.member;
                 if (memberManager.getSelf().equals(member)) {
+                    //当前节点自身
                     if (syncRequest.isBeta()) {
                         dumpService.dump(syncRequest.getDataId(), syncRequest.getGroup(), syncRequest.getTenant(),
                                 syncRequest.getLastModified(), NetUtils.localIP(), true);
@@ -161,8 +167,7 @@ public class AsyncNotifyService {
 
                         // grpc report data change only
                         try {
-                            configClusterRpcClientProxy
-                                    .syncConfigChange(member, syncRequest, new AsyncRpcNotifyCallBack(task));
+                            configClusterRpcClientProxy.syncConfigChange(member, syncRequest, new AsyncRpcNotifyCallBack(task));
                         } catch (Exception e) {
                             MetricsMonitor.getConfigNotifyException().increment();
                             asyncTaskExecute(task);
@@ -184,7 +189,17 @@ public class AsyncNotifyService {
         private boolean isBeta;
         
         private String tag;
-        
+
+        /**
+         * 通知单个RPC任务
+         * @param dataId       数据id
+         * @param group        组
+         * @param tenant       房客
+         * @param tag          标签
+         * @param lastModified
+         * @param isBeta
+         * @param member
+         */
         public NotifySingleRpcTask(String dataId, String group, String tenant, String tag, long lastModified,
                 boolean isBeta, Member member) {
             super(dataId, group, tenant, lastModified);

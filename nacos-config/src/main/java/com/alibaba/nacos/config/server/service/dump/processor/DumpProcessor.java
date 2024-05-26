@@ -67,7 +67,8 @@ public class DumpProcessor implements NacosTaskProcessor {
         String handleIp = dumpTask.getHandleIp();
         boolean isBeta = dumpTask.isBeta();
         String tag = dumpTask.getTag();
-        
+
+        //构建 ConfigDumpEvent
         ConfigDumpEvent.ConfigDumpEventBuilder build = ConfigDumpEvent.builder().namespaceId(tenant).dataId(dataId)
                 .group(group).isBeta(isBeta).tag(tag).lastModifiedTs(lastModified).handleIp(handleIp);
         
@@ -82,7 +83,9 @@ public class DumpProcessor implements NacosTaskProcessor {
             
             return DumpConfigHandler.configDump(build.build());
         }
+
         if (StringUtils.isBlank(tag)) {
+            //配置信息
             ConfigInfo cf = configInfoPersistService.findConfigInfo(dataId, group, tenant);
             
             build.remove(Objects.isNull(cf));

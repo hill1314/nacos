@@ -628,8 +628,11 @@ public class ClientWorker implements Closeable {
             /*
              * Register Config Change /Config ReSync Handler
              */
+            //注册 服务端请求处理程序
             rpcClientInner.registerServerRequestHandler((request) -> {
+                //（服务端推送的）配置变更通知请求
                 if (request instanceof ConfigChangeNotifyRequest) {
+
                     ConfigChangeNotifyRequest configChangeNotifyRequest = (ConfigChangeNotifyRequest) request;
                     LOGGER.info("[{}] [server-push] config changed. dataId={}, group={},tenant={}",
                             rpcClientInner.getName(), configChangeNotifyRequest.getDataId(),
@@ -642,6 +645,7 @@ public class ClientWorker implements Closeable {
                         synchronized (cacheData) {
                             cacheData.getLastModifiedTs().set(System.currentTimeMillis());
                             cacheData.setSyncWithServer(false);
+                            //触发 监听
                             notifyListenConfig();
                         }
 
@@ -651,6 +655,7 @@ public class ClientWorker implements Closeable {
                 return null;
             });
 
+            //客户端配置指标请求
             rpcClientInner.registerServerRequestHandler((request) -> {
                 if (request instanceof ClientConfigMetricRequest) {
                     ClientConfigMetricResponse response = new ClientConfigMetricResponse();

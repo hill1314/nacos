@@ -81,6 +81,7 @@ public class ConfigCacheService {
     
     /**
      * Save config file and update md5 value in cache.
+     * 缓存同步
      *
      * @param dataId         dataId string value.
      * @param group          group string value.
@@ -93,8 +94,11 @@ public class ConfigCacheService {
     public static boolean dump(String dataId, String group, String tenant, String content, long lastModifiedTs,
             String type, String encryptedDataKey) {
         String groupKey = GroupKey2.getKey(dataId, group, tenant);
+        //
         CacheItem ci = makeSure(groupKey, encryptedDataKey, false);
         ci.setType(type);
+
+        //获取写锁
         final int lockResult = tryWriteLock(groupKey);
         assert (lockResult != 0);
         
@@ -105,21 +109,27 @@ public class ConfigCacheService {
         
         try {
             final String md5 = MD5Utils.md5Hex(content, Constants.ENCODE);
+            //时间判断
             if (lastModifiedTs < ConfigCacheService.getLastModifiedTs(groupKey)) {
                 DUMP_LOG.warn("[dump-ignore] the content is old. groupKey={}, md5={}, lastModifiedOld={}, "
                                 + "lastModifiedNew={}", groupKey, md5, ConfigCacheService.getLastModifiedTs(groupKey),
                         lastModifiedTs);
                 return true;
             }
+
             if (md5.equals(ConfigCacheService.getContentMd5(groupKey)) && DiskUtil.targetFile(dataId, group, tenant).exists()) {
                 DUMP_LOG.warn("[dump-ignore] ignore to save cache file. groupKey={}, md5={}, lastModifiedOld={}, "
                                 + "lastModifiedNew={}", groupKey, md5, ConfigCacheService.getLastModifiedTs(groupKey),
                         lastModifiedTs);
             } else if (!PropertyUtil.isDirectRead()) {
+                //磁盘保存
                 DiskUtil.saveToDisk(dataId, group, tenant, content);
             }
+
+            //更新MD5
             updateMd5(groupKey, md5, lastModifiedTs, encryptedDataKey);
             return true;
+
         } catch (IOException ioe) {
             DUMP_LOG.error("[dump-exception] save disk error. " + groupKey + ", " + ioe);
             if (ioe.getMessage() != null) {
@@ -506,6 +516,7 @@ public class ConfigCacheService {
         if (cache.md5 == null || !cache.md5.equals(md5)) {
             cache.md5 = md5;
             cache.lastModifiedTs = lastModifiedTs;
+            //发一个更新本地缓存的事件通知 （RpcConfigChangeNotifier 中会做处理）
             NotifyCenter.publishEvent(new LocalDataChangeEvent(groupKey));
         }
     }

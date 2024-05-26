@@ -47,6 +47,7 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
         final String type = event.getType();
         final long lastModified = event.getLastModifiedTs();
         final String encryptedDataKey = event.getEncryptedDataKey();
+
         if (event.isBeta()) {
             boolean result;
             if (event.isRemove()) {
@@ -69,6 +70,7 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
             
             return result;
         }
+
         if (StringUtils.isBlank(event.getTag())) {
             if (dataId.equals(AggrWhitelist.AGGRIDS_METADATA)) {
                 AggrWhitelist.load(content);
@@ -84,6 +86,7 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
             
             boolean result;
             if (!event.isRemove()) {
+                //
                 result = ConfigCacheService
                         .dump(dataId, group, namespaceId, content, lastModified, type, encryptedDataKey);
                 
